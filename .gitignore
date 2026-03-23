@@ -23,5 +23,25 @@ env/
 .DS_Store
 Thumbs.db
 
+# Environment variables
+.env
+*.env.local
+
 # Dependencies (uncomment if you want to commit them)
 # requirements.txt
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Flask
+instance/
+
+# Migrations (除alembic.ini外)
+migrations/versions/
+!migrations/versions/.gitkeep
+migrations/versions/*.py

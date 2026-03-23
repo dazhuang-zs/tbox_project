@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}页面未找到 - 基金持仓管理系统{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 80px 20px;">
+    <h1 style="font-size: 72px; color: #667eea; margin-bottom: 20px;">404</h1>
+    <h2 style="font-size: 32px; color: #333; margin-bottom: 20px;">页面未找到</h2>
+    <p style="color: #666; font-size: 18px; margin-bottom: 40px;">
+        抱歉，您访问的页面不存在或已被移除。
+    </p>
+    <a href="{{ url_for('fund.dashboard') }}" class="btn btn-primary" style="font-size: 16px; padding: 12px 32px;">
+        返回首页
+    </a>
+</div>
+{% endblock %}

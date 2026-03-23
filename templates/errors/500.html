@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}服务器错误 - 基金持仓管理系统{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 80px 20px;">
+    <h1 style="font-size: 72px; color: #ff4757; margin-bottom: 20px;">500</h1>
+    <h2 style="font-size: 32px; color: #333; margin-bottom: 20px;">服务器内部错误</h2>
+    <p style="color: #666; font-size: 18px; margin-bottom: 40px;">
+        抱歉，服务器遇到了一些问题，请稍后重试。
+    </p>
+    <div style="display: flex; gap: 20px; justify-content: center;">
+        <a href="{{ url_for('fund.dashboard') }}" class="btn btn-primary" style="font-size: 16px; padding: 12px 32px;">
+            返回首页
+        </a>
+        <button onclick="window.location.reload()" class="btn" style="font-size: 16px; padding: 12px 32px; background: #f0f2f5; color: #333;">
+            刷新页面
+        </button>
+    </div>
+</div>
+{% endblock %}

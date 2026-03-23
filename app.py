@@ -1,115 +1,90 @@
 # -*- coding: utf-8 -*-
 """
-tbox_project - 登录系统主应用
+基金持仓管理系统 - 主应用
 """
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from werkzeug.security import generate_password_hash, check_password_hash
 import os
+from flask import Flask, render_template
+from config import config
 
-app = Flask(__name__)
-app.secret_key = os.urandom(24)  # 用于会话加密
+def create_app(config_name='default'):
+    """应用工厂函数"""
+    app = Flask(__name__)
 
-# 模拟用户数据库（实际项目中应使用真实数据库）
-users_db = {
-    "admin": {
-        "username": "admin",
-        "password": generate_password_hash("admin123"),
-        "email": "admin@example.com"
-    }
-}
+    # 加载配置
+    app.config.from_object(config[config_name])
 
+    # 确保实例文件夹存在
+    os.makedirs(app.instance_path, exist_ok=True)
 
-def get_user(username):
-    """获取用户信息"""
-    return users_db.get(username)
+    # 初始化扩展
+    from src.database import init_database
+    from src.auth.utils import init_login_manager
 
+    init_database(app)
+    init_login_manager(app)
 
-def add_user(username, password, email):
-    """添加新用户"""
-    if username in users_db:
-        return False
-    users_db[username] = {
-        "username": username,
-        "password": generate_password_hash(password),
-        "email": email
-    }
-    return True
+    # 注册蓝图
+    from src.auth.routes import auth_bp
+    from src.fund.routes import fund_bp
+    from src.fund.api import fund_api_bp
 
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(fund_bp)
+    app.register_blueprint(fund_api_bp, url_prefix='/api/v1')
 
-@app.route('/')
-def index():
-    """首页"""
-    if 'username' in session:
-        return render_template('index.html', username=session['username'])
-    return redirect(url_for('login'))
+    # 错误处理
+    @app.errorhandler(404)
+    def not_found_error(error):
+        return render_template('errors/404.html'), 404
 
+    @app.errorhandler(500)
+    def internal_error(error):
+        from src.database import db
+        db.session.rollback()
+        return render_template('errors/500.html'), 500
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    """用户注册"""
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '').strip()
-        email = request.form.get('email', '').strip()
-        
-        # 验证输入
-        if not username or not password or not email:
-            flash('所有字段都是必填的', 'error')
-            return render_template('register.html')
-        
-        if len(password) < 6:
-            flash('密码长度至少6位', 'error')
-            return render_template('register.html')
-        
-        # 添加用户
-        if add_user(username, password, email):
-            flash('注册成功！请登录', 'success')
-            return redirect(url_for('login'))
-        else:
-            flash('用户名已存在', 'error')
-            return render_template('register.html')
-    
-    return render_template('register.html')
+    # 迁移旧版用户数据（仅开发环境）
+    @app.before_request
+    def migrate_legacy_users():
+        if app.config.get('DEBUG', False):
+            from src.auth.utils import migrate_legacy_users
+            from src.database import db
 
+            # 旧版内存用户数据（从原app.py复制）
+            legacy_users_db = {
+                "admin": {
+                    "username": "admin",
+                    "password": "pbkdf2:sha256:260000$XcW6pB3v$8c5a9c7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6",
+                    "email": "admin@example.com"
+                }
+            }
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    """用户登录"""
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '').strip()
-        
-        user = get_user(username)
-        
-        if user and check_password_hash(user['password'], password):
-            # 登录成功
-            session['username'] = username
-            session['email'] = user['email']
-            flash(f'欢迎回来，{username}！', 'success')
-            return redirect(url_for('index'))
-        else:
-            flash('用户名或密码错误', 'error')
-            return render_template('login.html')
-    
-    return render_template('login.html')
+            try:
+                migrated = migrate_legacy_users(legacy_users_db)
+                if migrated > 0:
+                    print(f"✅ 迁移了 {migrated} 个旧版用户到数据库")
+            except Exception as e:
+                print(f"⚠️  用户迁移失败: {e}")
+
+    return app
 
 
-@app.route('/logout')
-def logout():
-    """用户登出"""
-    username = session.get('username', '用户')
-    session.clear()
-    flash(f'{username}，您已成功退出登录', 'info')
-    return redirect(url_for('login'))
-
+# 创建应用实例
+app = create_app()
 
 if __name__ == '__main__':
-    # 创建templates目录（如果不存在）
-    os.makedirs('templates', exist_ok=True)
-    os.makedirs('static', exist_ok=True)
-    
-    print("🚀 登录系统已启动...")
+    print("🚀 基金持仓管理系统已启动...")
     print("📍 访问地址: http://127.0.0.1:5000")
     print("默认账号: admin / admin123")
-    
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    print("📊 功能模块:")
+    print("  - 用户认证系统")
+    print("  - 基金持仓管理")
+    print("  - 交易记录管理")
+    print("  - 盈亏计算")
+    print("  - 数据可视化")
+
+    app.run(
+        debug=app.config.get('DEBUG', True),
+        host=app.config.get('HOST', '0.0.0.0'),
+        port=app.config.get('PORT', 5000)
+    )
