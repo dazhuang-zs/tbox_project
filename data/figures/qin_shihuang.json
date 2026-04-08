@@ -1,0 +1,200 @@
+{
+  "id": "fig_004",
+  "name": "秦始皇",
+  "era": "秦朝",
+  "dynasty": "秦",
+  "birth_year": -259,
+  "death_year": -210,
+  "birth_place": "赵国邯郸（今河北省邯郸市）",
+  "titles": ["始皇帝", "千古一帝"],
+  "avatar": "/static/images/qin_shihuang.jpg",
+  "gender": "男",
+  "ethnicity": "汉族",
+  "family_background": "秦庄襄王之子，母为赵姬",
+  
+  "biography": {
+    "summary": "秦始皇（前259年-前210年），嬴姓，名政，中国历史上第一个统一全国的皇帝。他建立了中国历史上第一个大一统的中央集权封建王朝——秦朝，开创了皇帝制度、郡县制等，对中国历史产生了深远影响。",
+    "detailed": "秦始皇出生于赵国邯郸，少年时在赵国为人质。13岁继承王位，由吕不韦、李斯等人辅政。22岁开始亲政，先后平定嫪毐叛乱、罢免吕不韦。此后开始统一战争，用十年时间消灭六国，建立秦朝。统一后，推行书同文、车同轨、统一度量衡，修建长城、驰道，被誉为千古一帝。但因严刑峻法、焚书坑儒等政策，也饱受争议。秦始皇第五次东巡时病逝于沙丘。",
+    "key_life_events": [
+      {
+        "year": -259,
+        "age": 0,
+        "event": "出生于赵国邯郸",
+        "significance": "作为人质之子，童年坎坷"
+      },
+      {
+        "year": -247,
+        "age": 13,
+        "event": "继承秦王位",
+        "significance": "开始帝王生涯"
+      },
+      {
+        "year": -238,
+        "age": 22,
+        "event": "平定嫪毐叛乱，亲政",
+        "significance": "开始掌握实权"
+      },
+      {
+        "year": -230,
+        "age": 30,
+        "event": "开始统一战争",
+        "significance": "开始大规模军事扩张"
+      },
+      {
+        "year": -221,
+        "age": 39,
+        "event": "统一六国，建立秦朝",
+        "significance": "完成统一大业，开创历史新篇章"
+      },
+      {
+        "year": -221,
+        "age": 39,
+        "event": "自称始皇帝",
+        "significance": "开创皇帝制度"
+      },
+      {
+        "year": -213,
+        "age": 47,
+        "event": "焚书坑儒",
+        "significance": "实施思想控制政策"
+      },
+      {
+        "year": -210,
+        "age": 50,
+        "event": "病逝于沙丘",
+        "significance": "秦朝二世而亡的开始"
+      }
+    ]
+  },
+  
+  "abilities": {
+    "political": {
+      "score": 96,
+      "description": "建立皇帝制度，开创郡县制，统一文字度量衡，政治才能卓越"
+    },
+    "military": {
+      "score": 90,
+      "description": "统一六国，军事战略眼光独到"
+    },
+    "literary": {
+      "score": 40,
+      "description": "非其所长"
+    },
+    "artistic": {
+      "score": 30,
+      "description": "非其所长"
+    },
+    "strategic": {
+      "score": 95,
+      "description": "战略规划能力极强，统一战略完备"
+    },
+    "charisma": {
+      "score": 75,
+      "description": "威严有余，亲和不足"
+    },
+    "innovation": {
+      "score": 98,
+      "description": "开创多项制度，影响后世两千年"
+    },
+    "leadership": {
+      "score": 92,
+      "description": "善于用人，王翦、李斯、蒙恬皆其所用"
+    }
+  },
+  
+  "achievements": [
+    {
+      "id": "ach_qin_001",
+      "title": "统一六国",
+      "description": "用十年时间消灭韩、赵、魏、楚、燕、齐六国，建立中国历史上第一个统一的多民族国家。",
+      "year": -221,
+      "category": "政治",
+      "impact_level": 10,
+      "impact_description": "开创了中国大一统的历史格局，影响深远"
+    },
+    {
+      "id": "ach_qin_002",
+      "title": "创立皇帝制度",
+      "description": "自称始皇帝，创立皇帝制度，确立皇权至高无上的地位。",
+      "year": -221,
+      "category": "政治",
+      "impact_level": 10,
+      "impact_description": "皇帝制度延续两千余年，深刻影响中国政治史"
+    },
+    {
+      "id": "ach_qin_003",
+      "title": "推行书同文、车同轨、统一度量衡",
+      "description": "在全国推行统一文字、货币、度量衡、车轨等，促进了国家的统一和发展。",
+      "year": -220,
+      "category": "政治",
+      "impact_level": 10,
+      "impact_description": "促进了民族融合和文化统一"
+    },
+    {
+      "id": "ach_qin_004",
+      "title": "修建长城",
+      "description": "连接战国长城，修建万里长城，抵御北方匈奴入侵。",
+      "year": -214,
+      "category": "军事",
+      "impact_level": 9,
+      "impact_description": "成为中华民族的象征，世界文化遗产"
+    }
+  ],
+  
+  "works": [
+    {
+      "title": "统一度量衡诏书",
+      "type": "诏书",
+      "year": -220,
+      "description": "统一度量衡的诏书，体现了秦始皇的统一意志。",
+      "famous_excerpt": "法度量则不壹，歉疑者皆明壹之。"
+    }
+  ],
+  
+  "relationships": {
+    "teachers": [],
+    "students": [],
+    "friends": [],
+    "allies": ["李斯", "王翦", "蒙恬"],
+    "enemies": ["六国诸侯", "匈奴"],
+    "family": {
+      "father": "秦庄襄王",
+      "mother": "赵姬",
+      "siblings": [],
+      "spouse": [],
+      "children": ["扶苏（长子）", "胡亥（第十八子）"]
+    }
+  },
+  
+  "tags": ["皇帝", "政治家", "军事家", "秦朝", "千古一帝"],
+  
+  "evaluations": {
+    "contemporary": [
+      {
+        "evaluator": "李斯",
+        "content": "今陛下并有天下，别白黑而定一尊。",
+        "source": "《史记》"
+      }
+    ],
+    "later_generations": [
+      {
+        "evaluator": "李白",
+        "content": "秦王扫六合，虎视何雄哉！",
+        "source": "《古风》"
+      },
+      {
+        "evaluator": "柳宗元",
+        "content": "秦之所以革之者，其为制，公之大者也。",
+        "source": "《封建论》"
+      }
+    ]
+  },
+  
+  "overall_rating": {
+    "total_score": 90,
+    "rank": "S",
+    "historical_influence": 99,
+    "cultural_contribution": 85,
+    "popularity": 95
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "id": "fig_001",
+  "name": "李白",
+  "era": "唐朝",
+  "dynasty": "唐",
+  "birth_year": 701,
+  "death_year": 762,
+  "birth_place": "西域碎叶城（今吉尔吉斯斯坦托克马克市）",
+  "titles": ["诗仙", "酒仙", "谪仙人"],
+  "avatar": "/static/images/li_bai.jpg",
+  "gender": "男",
+  "ethnicity": "汉族",
+  "family_background": "出身于西域商贾之家，后迁居四川绵州昌隆县",
+  
+  "biography": {
+    "summary": "李白（701年-762年），字太白，号青莲居士，又号谪仙人，唐代伟大的浪漫主义诗人，被后人誉为诗仙。与杜甫并称李杜，其诗风格豪放飘逸，想象丰富，语言流转自然，音律和谐多变。",
+    "detailed": "李白出生于西域碎叶城，五岁随家迁居四川绵州昌隆县。自幼聪慧好学，博览群书，尤其喜好道家思想。十五岁开始游历名山大川，结交天下豪杰。二十五岁时仗剑去国，辞亲远游，足迹遍及大半个中国。天宝元年，经道士吴筠推荐，被唐玄宗召入长安，供奉翰林。但因性格狂放不羁，得罪权贵，三年后被赐金放还。此后继续漫游天下，广交天下英才。安史之乱期间，因参与永王李璘幕府而受牵连，被流放夜郎，途中遇赦。晚年投奔族叔李阳冰，最终病逝于安徽当涂，终年六十二岁。",
+    "key_life_events": [
+      {
+        "year": 701,
+        "age": 0,
+        "event": "出生于西域碎叶城",
+        "significance": "独特的出生地为其诗歌增添了西域色彩"
+      },
+      {
+        "year": 706,
+        "age": 5,
+        "event": "随家迁居四川绵州昌隆县",
+        "significance": "蜀地山水对其诗歌风格产生深远影响"
+      },
+      {
+        "year": 716,
+        "age": 15,
+        "event": "开始学习剑术，游历蜀中",
+        "significance": "形成侠义精神，影响其诗歌风格"
+      },
+      {
+        "year": 726,
+        "age": 25,
+        "event": "仗剑去国，辞亲远游",
+        "significance": "开始长达数十年的漫游生涯"
+      },
+      {
+        "year": 742,
+        "age": 41,
+        "event": "被唐玄宗召入长安，供奉翰林",
+        "significance": "人生的高光时刻，接近权力中心"
+      },
+      {
+        "year": 744,
+        "age": 43,
+        "event": "被赐金放还，离开长安",
+        "significance": "仕途受挫，但开启了更自由的创作生涯"
+      },
+      {
+        "year": 757,
+        "age": 56,
+        "event": "因参与永王李璘幕府被流放夜郎",
+        "significance": "政治生涯的重大挫折"
+      },
+      {
+        "year": 762,
+        "age": 61,
+        "event": "病逝于当涂",
+        "significance": "一代诗仙就此陨落"
+      }
+    ]
+  },
+  
+  "abilities": {
+    "political": {
+      "score": 45,
+      "description": "虽有政治抱负，但缺乏实际从政经验，性格过于直率"
+    },
+    "military": {
+      "score": 55,
+      "description": "自幼习剑，有侠义精神，但非军事将才"
+    },
+    "literary": {
+      "score": 98,
+      "description": "千古诗仙，浪漫主义诗歌巅峰，作品流传千古"
+    },
+    "artistic": {
+      "score": 85,
+      "description": "精通音律，书法亦有造诣"
+    },
+    "strategic": {
+      "score": 50,
+      "description": "有大局观，但缺乏政治谋略"
+    },
+    "charisma": {
+      "score": 95,
+      "description": "人格魅力强大，广交天下英豪，深受百姓喜爱"
+    },
+    "innovation": {
+      "score": 92,
+      "description": "诗歌风格独创一格，突破传统束缚"
+    },
+    "leadership": {
+      "score": 40,
+      "description": "虽有号召力，但缺乏组织管理能力"
+    }
+  },
+  
+  "achievements": [
+    {
+      "id": "ach_li_001",
+      "title": "创造浪漫主义诗歌巅峰",
+      "description": "李白将浪漫主义诗歌推向了前所未有的高度，其诗风格豪放飘逸，想象奇特，语言流转自然，开创了诗歌新境界。",
+      "year": 730,
+      "category": "文学",
+      "impact_level": 10,
+      "impact_description": "对后世诗歌发展产生深远影响，成为中国文学史上的里程碑"
+    },
+    {
+      "id": "ach_li_002",
+      "title": "创作《将进酒》《蜀道难》等千古名篇",
+      "description": "创作了《将进酒》《蜀道难》《梦游天姥吟留别》《行路难》等数百首传世名作。",
+      "year": 752,
+      "category": "文学",
+      "impact_level": 10,
+      "impact_description": "这些作品成为中国古典诗歌的经典，至今仍被广泛传诵"
+    }
+  ],
+  
+  "works": [
+    {
+      "title": "《将进酒》",
+      "type": "诗歌",
+      "year": 752,
+      "description": "李白最著名的代表作之一，表达了对人生短暂的感慨和对自由的向往。",
+      "famous_excerpt": "君不见黄河之水天上来，奔流到海不复回。天生我材必有用，千金散尽还复来。"
+    },
+    {
+      "title": "《蜀道难》",
+      "type": "诗歌",
+      "year": 742,
+      "description": "描写蜀道险峻的名作，展现了李白奇特的想象力。",
+      "famous_excerpt": "噫吁嚱，危乎高哉！蜀道之难，难于上青天！"
+    },
+    {
+      "title": "《静夜思》",
+      "type": "诗歌",
+      "year": 726,
+      "description": "简洁而意境深远，是李白流传最广的诗作之一。",
+      "famous_excerpt": "床前明月光，疑是地上霜。举头望明月，低头思故乡。"
+    }
+  ],
+  
+  "relationships": {
+    "teachers": ["赵芮"],
+    "students": [],
+    "friends": ["杜甫", "孟浩然", "王昌龄", "贺知章"],
+    "allies": [],
+    "enemies": ["高力士", "杨国忠"],
+    "family": {
+      "father": "李客（商人）",
+      "mother": "不详",
+      "siblings": [],
+      "spouse": ["许氏（宰相许圉师孙女）", "宗氏"],
+      "children": ["李伯禽（子）", "李平阳（女）"]
+    }
+  },
+  
+  "tags": ["诗人", "浪漫主义", "唐代", "诗仙", "酒仙"],
+  
+  "evaluations": {
+    "contemporary": [
+      {
+        "evaluator": "杜甫",
+        "content": "李白斗酒诗百篇，长安市上酒家眠。天子呼来不上船，自称臣是酒中仙。",
+        "source": "《饮中八仙歌》"
+      }
+    ],
+    "later_generations": [
+      {
+        "evaluator": "韩愈",
+        "content": "李杜文章在，光焰万丈长。",
+        "source": "《调张籍》"
+      }
+    ]
+  },
+  
+  "overall_rating": {
+    "total_score": 78,
+    "rank": "A",
+    "historical_influence": 95,
+    "cultural_contribution": 98,
+    "popularity": 96
+  }
+}
