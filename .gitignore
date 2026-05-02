@@ -12,3 +12,10 @@ memory/
 
 # 配置（含 token）
 config/
+# 文章和搜索报告
+AGENTS.md
+HEARTBEAT.md
+IDENTITY.md
+SOUL.md
+TOOLS.md
+USER.md
