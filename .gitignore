@@ -1,0 +1,14 @@
+# 敏感信息
+auth.txt
+*.token
+*.secret
+.env
+
+# OpenClaw 运行时
+.openclaw/
+
+# 个人记忆（仅在主 session 使用）
+memory/
+
+# 配置（含 token）
+config/
