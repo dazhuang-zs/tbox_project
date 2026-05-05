@@ -446,4 +446,48 @@ myproject/
 
 > 💡 **核心认知**：Go不是"比Java/Python更好的语言"，是**不同哲学的语言**。它的简单是刻意的、并发是内置的、接口是隐式的。接受这些设计而非抗拒，你才能写出真正的Go代码。
 
-**你从什么语言转Go的？最不适应的是哪点？评论区交流。**
+---
+
+## 八、Go学习路线图（4周从入门到能干活）
+
+如果你是从Java/Python转过来的，这条路线比你想象的要短：
+
+```
+第1周：语法 + 工具链
+├── Day 1-2：变量/常量/函数/控制流（半天就能过完）
+├── Day 3-4：slice/map/struct/method/interface（核心数据结构）
+├── Day 5-6：go mod/package/import（模块系统）
+└── Day 7：用标准库写一个HTTP服务（net/http）
+   检验：能写出一个REST API
+
+第2周：并发
+├── Day 8-9：goroutine + channel + select
+├── Day 10-11：sync包（Mutex/WaitGroup/Once）
+├── Day 12-13：context包（超时/取消/传值）
+└── Day 14：errgroup + worker pool 实战
+   检验：写一个并发的爬虫或压测工具
+
+第3周：工程化
+├── Day 15-16：错误处理最佳实践 + 日志（slog）
+├── Day 17-18：测试（testing + testify + 表格驱动测试）
+├── Day 19-20：项目布局 + 依赖注入（wire）
+└── Day 21：CI/CD（GitHub Actions + Docker）
+   检验：写出有单元测试、有CI的生产级代码
+
+第4周：实战
+├── Day 22-28：选一个项目完整地做
+   推荐方向：
+   - 转换你之前用Python/Java写的某个工具
+   - CLI工具（cobra框架）
+   - API网关（gin/chi框架）
+   - 简单的数据库迁移工具
+```
+
+**避坑提醒**：
+- 第1周别碰并发——很多人第一天就写goroutine然后卡死
+- 别试图在Go里写"面向对象"——Go没有class，struct+method就是它的OO
+- 前两周只用标准库，第三周再引入第三方库
+
+---
+
+**你从什么语言转Go的？学到第几周了？评论区交流。**

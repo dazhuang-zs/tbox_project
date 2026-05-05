@@ -303,13 +303,75 @@ if random.random() < 0.05:  # 5%概率
 
 ### 第7招：字体反爬 → 分析字体文件
 
-有些网站把数字/文字替换成了自定义字体，HTML里是`&#x1234;`这种编码。需要下载`.woff`字体文件，映射字符编码到真实文字。
+有些网站把数字替换成了自定义字体，HTML里显示`&#x1234;`这种编码，但浏览器渲染出来是数字"5"。
 
-### 第8招：CSS反爬 → 检测伪元素
+**破解方法**：
 
-有些数据藏在`::before`、`::after`伪元素里，BeautifulSoup解析不到。这时候上Playwright，取`getComputedStyle`。
+```python
+# 1. 找到字体文件URL（在CSS里搜 @font-face）
+# 2. 下载字体文件
+import requests
+font_url = "https://example.com/fonts/custom.woff"
+with open("custom.woff", "wb") as f:
+    f.write(requests.get(font_url).content)
 
-### 第9招：蜜罐链接 → 正则过滤
+# 3. 用 fontTools 解析字体文件
+from fontTools.ttLib import TTFont
+
+font = TTFont("custom.woff")
+# 获取cmap表（Unicode码 → 字形名称的映射）
+cmap = font.getBestCmap()
+print(cmap)  # {0x1001: 'glyph001', 0x1002: 'glyph002', ...}
+
+# 4. 手动建立映射关系（打开网页截图，肉眼对照数字和编码）
+# 或者在字体查看工具中观察每个字形对应的数字
+char_map = {
+    '&#x1001;': '0',
+    '&#x1002;': '1',
+    '&#x1003;': '2',
+    # ... 根据实际对照结果填充
+}
+
+# 5. 替换HTML中的编码为真实数字
+def decode_font(html, char_map):
+    for code, char in char_map.items():
+        html = html.replace(code, char)
+    return html
+```
+
+现实中，有些网站的字体映射关系是动态变化的（每次请求字体文件都不一样）。对付这种情况，需要OCR截图识别数字，绕开字体解析。
+
+### 第8招：CSS伪元素 → 用Playwright取完整渲染结果
+
+```python
+from playwright.sync_api import sync_playwright
+
+def get_pseudo_element_content(url, selector):
+    """获取::before / ::after伪元素的内容"""
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
+        page.goto(url)
+        
+        # BeautifulSoup拿不到伪元素，但浏览器可以！
+        content = page.evaluate(f'''() => {{
+            const el = document.querySelector("{selector}");
+            const before = window.getComputedStyle(el, "::before");
+            return before.content;  // 返回伪元素的content值
+        }}''')
+        
+        browser.close()
+        return content.strip('"')  # content属性自带引号
+
+# 使用
+price = get_pseudo_element_content(
+    "https://example.com/product", 
+    ".price-tag"
+)
+print(f"伪元素中的价格: {price}")
+```
+
+### 第9招：蜜罐链接 → 正则过滤 + 域名白名单
 
 爬全站时，有些链接是故意放给爬虫的（如`/admin/delete-all`这种）。加黑名单正则过滤：
 ```python
