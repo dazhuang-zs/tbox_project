@@ -1,0 +1,225 @@
+{
+  "id": "fig_003",
+  "name": "诸葛亮",
+  "era": "三国",
+  "dynasty": "蜀汉",
+  "birth_year": 181,
+  "death_year": 234,
+  "birth_place": "琅琊阳都（今山东省沂南县）",
+  "titles": ["卧龙", "丞相", "武侯"],
+  "avatar": "/static/images/zhuge_liang.jpg",
+  "gender": "男",
+  "ethnicity": "汉族",
+  "family_background": "出身于官宦之家，父诸葛珪曾任郡丞",
+  
+  "biography": {
+    "summary": "诸葛亮（181年-234年），字孔明，号卧龙，三国时期蜀汉丞相，杰出的政治家、军事家、文学家、发明家。辅佐刘备建立蜀汉政权，一生鞠躬尽瘁，死而后已，是中国传统文化中忠臣与智者的代表人物。",
+    "detailed": "诸葛亮出生于琅琊阳都，早年丧父，随叔父诸葛玄投奔荆州刘表。诸葛玄死后，诸葛亮隐居隆中，躬耕陇亩。建安十二年（207年），刘备三顾茅庐，诸葛亮出山，献隆中对，为刘备谋划天下三分之策。此后协助刘备联合孙权，在赤壁之战中大败曹操，占领荆州。后又助刘备取得益州，建立蜀汉政权。刘备死后，诸葛亮辅佐刘禅，六出祁山北伐曹魏，但未能成功。建兴十二年（234年），诸葛亮病逝于五丈原。",
+    "key_life_events": [
+      {
+        "year": 181,
+        "age": 0,
+        "event": "出生于琅琊阳都",
+        "significance": "出生于官宦之家，为日后成才奠定基础"
+      },
+      {
+        "year": 197,
+        "age": 16,
+        "event": "隐居隆中",
+        "significance": "开始隐居生活，钻研兵法、天文、地理"
+      },
+      {
+        "year": 207,
+        "age": 26,
+        "event": "刘备三顾茅庐，出山辅佐",
+        "significance": "人生转折点，开始施展抱负"
+      },
+      {
+        "year": 208,
+        "age": 27,
+        "event": "赤壁之战，联合孙权大败曹操",
+        "significance": "天下三分格局初现"
+      },
+      {
+        "year": 221,
+        "age": 40,
+        "event": "刘备称帝，建立蜀汉，诸葛亮任丞相",
+        "significance": "蜀汉政权正式建立"
+      },
+      {
+        "year": 223,
+        "age": 42,
+        "event": "刘备病逝，托孤于诸葛亮",
+        "significance": "承担辅佐幼主、复兴汉室的重任"
+      },
+      {
+        "year": 225,
+        "age": 44,
+        "event": "南征孟获，七擒七纵",
+        "significance": "平定南方，解除了后顾之忧"
+      },
+      {
+        "year": 228,
+        "age": 47,
+        "event": "第一次北伐，一出祁山",
+        "significance": "开始北伐曹魏的征程"
+      },
+      {
+        "year": 234,
+        "age": 53,
+        "event": "病逝于五丈原",
+        "significance": "鞠躬尽瘁，死而后已"
+      }
+    ]
+  },
+  
+  "abilities": {
+    "political": {
+      "score": 95,
+      "description": "治国有方，蜀汉虽小但治理得井井有条"
+    },
+    "military": {
+      "score": 88,
+      "description": "虽北伐未成，但军事才能卓越，善于用兵"
+    },
+    "literary": {
+      "score": 85,
+      "description": "文章传世，《出师表》千古流传"
+    },
+    "artistic": {
+      "score": 50,
+      "description": "非其主要才能"
+    },
+    "strategic": {
+      "score": 96,
+      "description": "战略眼光长远，隆中对奠定三分天下格局"
+    },
+    "charisma": {
+      "score": 92,
+      "description": "人格魅力强大，深受军民爱戴"
+    },
+    "innovation": {
+      "score": 90,
+      "description": "发明木牛流马、诸葛连弩等，且治理蜀汉多有创新"
+    },
+    "leadership": {
+      "score": 94,
+      "description": "善于用人治国，领导能力强"
+    }
+  },
+  
+  "achievements": [
+    {
+      "id": "ach_zg_001",
+      "title": "隆中对三分天下",
+      "description": "提出《隆中对》，准确预见了天下三分的格局，为刘备制定了战略蓝图。",
+      "year": 207,
+      "category": "政治",
+      "impact_level": 10,
+      "impact_description": "奠定了三国鼎立的政治格局"
+    },
+    {
+      "id": "ach_zg_002",
+      "title": "赤壁联吴抗曹",
+      "description": "成功说服孙权联合抗曹，促成赤壁之战的胜利。",
+      "year": 208,
+      "category": "军事",
+      "impact_level": 10,
+      "impact_description": "改变了历史进程，奠定了三国格局"
+    },
+    {
+      "id": "ach_zg_003",
+      "title": "治蜀兴国",
+      "description": "治理蜀汉，发展经济，兴修水利，制定法律，使蜀汉成为治理最好的国家。",
+      "year": 223,
+      "category": "政治",
+      "impact_level": 9,
+      "impact_description": "乱世中难得的治世，为后世治国提供了典范"
+    },
+    {
+      "id": "ach_zg_004",
+      "title": "发明创造",
+      "description": "发明了木牛流马、诸葛连弩、孔明灯等，体现了卓越的创造才能。",
+      "year": 230,
+      "category": "科技",
+      "impact_level": 8,
+      "impact_description": "推动了古代军事科技的发展"
+    }
+  ],
+  
+  "works": [
+    {
+      "title": "《出师表》",
+      "type": "文章",
+      "year": 227,
+      "description": "北伐前上给后主刘禅的奏表，表达了对蜀汉的忠诚和对国家的忧患。",
+      "famous_excerpt": "先帝创业未半而中道崩殂，今天下三分，益州疲弊，此诚危急存亡之秋也。"
+    },
+    {
+      "title": "《诚子书》",
+      "type": "文章",
+      "year": 234,
+      "description": "写给儿子诸葛瞻的家书，体现了诸葛亮的品德修养和教子之道。",
+      "famous_excerpt": "静以修身，俭以养德。非淡泊无以明志，非宁静无以致远。"
+    },
+    {
+      "title": "《隆中对》",
+      "type": "文章",
+      "year": 207,
+      "description": "为刘备分析天下形势并提出战略规划的经典之作。",
+      "famous_excerpt": "今操已拥百万之众，挟天子以令诸侯，此诚不可与争锋。"
+    }
+  ],
+  
+  "relationships": {
+    "teachers": [],
+    "students": [],
+    "friends": ["徐庶", "崔州平", "石广元", "孟公威"],
+    "allies": ["刘备", "关羽", "张飞", "赵云", "姜维"],
+    "enemies": ["曹操", "司马懿", "曹真"],
+    "family": {
+      "father": "诸葛珪",
+      "mother": "章氏",
+      "siblings": ["诸葛瑾（兄）", "诸葛均（弟）"],
+      "spouse": ["黄月英"],
+      "children": ["诸葛瞻（子）"]
+    }
+  },
+  
+  "tags": ["政治家", "军事家", "发明家", "三国", "忠臣", "智者"],
+  
+  "evaluations": {
+    "contemporary": [
+      {
+        "evaluator": "刘备",
+        "content": "孤之有孔明，犹鱼之有水也。",
+        "source": "《三国志》"
+      },
+      {
+        "evaluator": "司马懿",
+        "content": "天下奇才也！",
+        "source": "《三国志》"
+      }
+    ],
+    "later_generations": [
+      {
+        "evaluator": "杜甫",
+        "content": "三顾频烦天下计，两朝开济老臣心。出师未捷身先死，长使英雄泪满襟。",
+        "source": "《蜀相》"
+      },
+      {
+        "evaluator": "陆游",
+        "content": "出师一表真名世，千载谁堪伯仲间！",
+        "source": "《书愤》"
+      }
+    ]
+  },
+  
+  "overall_rating": {
+    "total_score": 92,
+    "rank": "S",
+    "historical_influence": 98,
+    "cultural_contribution": 95,
+    "popularity": 99
+  }
+}
