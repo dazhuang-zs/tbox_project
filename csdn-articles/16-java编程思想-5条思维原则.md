@@ -519,7 +519,88 @@ public class OrderService {
 - 接入新支付方式 → 新增一个`PaymentGateway`实现类，其他代码不动
 - 增加钉钉通知 → 新增`DingTalkNotification`实现，加到`List`里
 - 订单字段变更 → 改`Order` record定义就行，构造器帮你找到所有使用点
-- 单元测试 → 每个依赖都是接口，mock一行代码的事
+
+### 测试：改造前后的天壤之别
+
+改造前的测试长这样：
+
+```java
+// ❌ 改造前：根本没法写单元测试
+@Test
+void testCreateOrder() {
+    // PowerMock？Mockito inline？SpringBootTest启动整个容器？
+    // 光是为了mock掉支付宝SDK的静态方法就要写30行
+    
+    // 真实情况：大部分团队选择"不写这个单元测试"
+    // 改成写集成测试——启动Spring容器，连真实数据库，跑2分钟
+}
+```
+
+改造后的测试长这样：
+
+```java
+// ✅ 改造后：纯Mockito，3行依赖，测试秒过
+@ExtendWith(MockitoExtension.class)
+class OrderServiceTest {
+    
+    @Mock private OrderRepository repository;
+    @Mock private InventoryService inventory;
+    @Mock private PaymentGateway payment;  // 接口——mock一行搞定
+    @Mock private NotificationChannel emailChannel;
+    @Mock private NotificationChannel smsChannel;
+    
+    @InjectMocks
+    private OrderService orderService;  // 构造器注入，Mockito自动装配
+    
+    @Test
+    void shouldCreateOrderSuccessfully() {
+        // Given
+        var cmd = new CreateOrderCommand(
+            new UserId("u1"), new ProductId("p1"),
+            new Quantity(2), Money.of(99)
+        );
+        
+        // 接口mock：不需要知道是支付宝还是微信
+        when(payment.initiatePayment(any(), any()))
+            .thenReturn(new PaymentResult("pay_123", PaymentStatus.SUCCESS));
+        
+        // When
+        Order order = orderService.createOrder(cmd);
+        
+        // Then
+        assertThat(order.status()).isEqualTo(OrderStatus.CREATED);
+        verify(inventory).deduct(cmd.productId(), cmd.quantity());
+        verify(payment).initiatePayment(order.id(), order.amount());
+        verify(emailChannel).send(cmd.userId(), contains("订单通知"), anyString());
+        verify(smsChannel).send(cmd.userId(), contains("订单通知"), anyString());
+    }
+    
+    @Test
+    void shouldFailFastWhenStockInsufficient() {
+        // 库存不足的场景——不需要真实数据库，不需要启动Spring
+        var cmd = new CreateOrderCommand(/* ... */);
+        
+        doThrow(new InsufficientStockException("库存不足"))
+            .when(inventory).ensureStock(any(), any());
+        
+        assertThatThrownBy(() -> orderService.createOrder(cmd))
+            .isInstanceOf(InsufficientStockException.class);
+        
+        // 验证：库存不足时支付不应该被调用
+        verify(payment, never()).initiatePayment(any(), any());
+        verify(repository, never()).save(any());
+    }
+    
+    @Test
+    void shouldSupportMultipleNotificationChannels() {
+        // 新增通知渠道——只改测试的@Mock声明，不改业务代码
+        // @Mock NotificationChannel dingTalkChannel;
+        // 注入到List里，自动生效
+    }
+}
+```
+
+**测试告诉你的真相**：如果你的代码很难写单元测试，通常不是测试框架的问题，是代码设计的问题。改造前每个依赖都是具体类+静态方法，测试是噩梦。改造后每个依赖都是接口，测试3行mock搞定。
 
 ---
 

@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "skills": {
+    "skill-vetting": {
+      "version": "1.1.0",
+      "installedAt": 1777695884807
+    },
+    "multi-search-engine": {
+      "version": "2.1.3",
+      "installedAt": 1777695906055
+    },
+    "self-improving-agent": {
+      "version": "3.0.16",
+      "installedAt": 1777695906394
+    },
+    "seo-content-writer": {
+      "version": "9.1.0",
+      "installedAt": 1777695925583
+    },
+    "browser-use": {
+      "version": "2.0.1",
+      "installedAt": 1777695925602
+    },
+    "skill-compass": {
+      "version": "1.0.5",
+      "installedAt": 1777695926520
+    },
+    "code-review": {
+      "version": "1.0.0",
+      "installedAt": 1777695945009
+    },
+    "git-workflow": {
+      "version": "1.0.0",
+      "installedAt": 1777695945183
+    },
+    "tavily-search": {
+      "version": "1.0.0",
+      "installedAt": 1777695945355
+    }
+  }
+}
