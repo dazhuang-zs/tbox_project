@@ -263,7 +263,7 @@ struct Index {
 
 ---
 
-> 📦 完整代码已上传到 GitHub：https://github.com/dazhuang-zs/harmonyos-series
+> 📦 完整代码已上传到 GitHub：https://github.com/dazhuang-zs/harmonyos-series（真实仓库，有全套代码！）
 > 
 > 💬 有问题欢迎评论区留言，我会逐条回复。
 > 
