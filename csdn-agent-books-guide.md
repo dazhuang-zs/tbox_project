@@ -33,7 +33,7 @@
 │  └─ ② 《图解AI Agent》 王振丽     北京大学 2025.11     │
 ├──────────────────────────────────────────────────────┤
 │  进阶级（会搭 → 懂原理）                                │
-│  ├─ ③ 《AI Agents in Action》 Lanham  Manning 2026    │
+│  ├─ ③ 《AI Agents in Action》(第2版) Lanham  Manning 2026    │
 │  ├─ ④ 《Building Agentic AI》 Ozdemir  Packt 2025     │
 │  └─ ⑤ 《Agentic Artificial Intelligence》 2025        │
 ├──────────────────────────────────────────────────────┤
@@ -172,7 +172,7 @@
 
 ```
 第1步：② 王振丽《图解AI Agent》— 建立系统认知
-第2步：③ Lanham《AI Agents in Action》— 全面实战
+第2步：③ Lanham《AI Agents in Action》(第2版) — 全面实战
 第3步：④ Ozdemir《Building Agentic AI》— 工程化思维
 ```
 
@@ -203,8 +203,8 @@
 |----------|-----------|
 | 零基础，想快速体验 | 罗健《用Coze搭建AI Agent》 |
 | 有基础，想系统学习 | 王振丽《图解AI Agent》 |
-| 要跳槽/提升竞争力 | Lanham《AI Agents in Action》 |
-| 架构师/技术决策 | Lanham + Ozdemir + Google 白皮书 |
+| 要跳槽/提升竞争力 | Lanham《AI Agents in Action》(第2版) |
+| 架构师/技术决策 | Lanham(第2版) + Ozdemir + Google 白皮书 |
 
 **一句话**：2026 年不读 Agent 的开发者，就像 2016 年不读深度学习的开发者——窗口期不会永远敞开。
 

@@ -1,8 +1,8 @@
-# 【AI Agent 内核】从 Manning 神书提炼：生产级多智能体系统的六大设计模式
+# 【AI Agent 内核】2026年从 Manning 神书提炼：生产级多智能体系统的六大设计模式
 
 > **标签**：`#AI Agent` `#Multi-Agent` `#架构设计` `#LangGraph` `#技术深度`
 
-> 市面上讲 AI Agent 的文章很多，但 90% 停留在"调一个 API + 加个工具调用 = Agent"的水平。真正的生产级 Agent 系统需要解决什么问题？2026 年 Manning 出版的《AI Agents in Action》（第 2 版，Micheal Lanham 著）是目前最系统的一本 Agent 工程实践书。本文不是书摘，而是提炼其核心思想，结合实战视角重新组织的六大设计模式。
+> 市面上讲 AI Agent 的文章很多，但 90% 停留在"调一个 API + 加个工具调用 = Agent"的水平。真正的生产级 Agent 系统需要解决什么问题？本文从 Demo 与 Production 的鸿沟→六大设计模式逐层拆解→工程落地总结，帮你一次性建立生产级 Agent 的完整心智模型。基于 2026 年 Manning 出版的《AI Agents in Action》（第 2 版，Micheal Lanham 著）核心思想提炼，不是书摘，是重组+延伸。
 
 ---
 
