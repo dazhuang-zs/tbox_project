@@ -1,6 +1,10 @@
-# 【Claude Code 内核揭秘】CLAUDE.md 不过是个便利贴？其记忆与上下文管理机制深度拆解
+# 【Claude Code 内核揭秘】2026年深度拆解：6层上下文架构如何拼出 AI 的"记忆"
 
-> 很多人以为 Claude Code 的"记忆"就是那个 CLAUDE.md 文件——本质上它确实是。但背后的上下文拼接、System Prompt 注入、会话历史管理三层设计，远比一个 Markdown 文件精彩得多。本文从源码行为反推 + 对比其他 AI 编码工具的角度，帮你彻底搞懂 Claude Code 是怎么"记住"你和你的项目的。
+> **标签**：`#ClaudeCode` `#AI编程` `#上下文管理` `#AI Agent` `#技术深度`
+
+> **版本**：本文基于 Claude Code v2.x（2026年5月），机制描述来源于源码行为反推 + 官方文档交叉验证。
+
+> 很多人以为 Claude Code 的"记忆"就是那个 CLAUDE.md 文件——本质上它确实是。但背后的上下文拼接、System Prompt 注入、会话历史管理**六层架构设计**，远比一个 Markdown 文件精彩得多。本文从源码行为反推 + 对比 7 款 AI 编码工具的角度，帮你彻底搞懂 Claude Code 是怎么"记住"你和你的项目的。
 
 ---
 
@@ -260,6 +264,16 @@ Claude Code 要走这条路，可能需要突破"纯文件"的架构限制。
 **一句话**：Claude Code 的记忆 = 一块你需要自己写的白板。它能让你写得很漂亮，但不会"替你记住什么"。
 
 如果你需要一个真正有记忆的 AI Agent——会写日记、能从错误中学习、跨会话保持上下文的——Claude Code 做不到。但这不一定是缺点：对很多开发者来说，**明确可控的白板 > 一个自己瞎编的"记忆"**。
+
+---
+
+---
+
+## 参考资源
+
+- [Claude Code 官方文档](https://docs.anthropic.com/en/docs/claude-code/overview)
+- [Anthropic System Prompts 研究](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)
+- [OpenClaw 记忆系统设计](https://docs.openclaw.ai)
 
 ---
 
