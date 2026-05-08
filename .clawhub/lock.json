@@ -36,6 +36,14 @@
     "tavily-search": {
       "version": "1.0.0",
       "installedAt": 1777695945355
+    },
+    "karpathy-perspective": {
+      "version": "1.0.0",
+      "installedAt": 1778197872899
+    },
+    "logic-hunter": {
+      "version": "1.0.0",
+      "installedAt": 1778216180156
     }
   }
 }
