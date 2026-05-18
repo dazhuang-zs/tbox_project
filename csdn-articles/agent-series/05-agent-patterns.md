@@ -299,6 +299,73 @@ task = """
 
 ---
 
+## 八、生产实战：Agent 上线后才知道的事
+
+### 8.1 Agent 无限循环——每月至少遇到一次
+
+ReAct Agent 最常见的 bug：LLM 反复调用同一个工具，永远到不了 Final Answer。
+
+一个代码审查 Agent 因为 LLM 对修复不满意，连续调了 14 次 read_file + write_file，烧了 $2 Token，什么都没改好：
+
+```python
+MAX_STEPS = 5
+STAGNATION_LIMIT = 3  # 连续同一动作超过 3 次 → 强制终止
+
+def detect_loop(action_history: list) -> bool:
+    if len(action_history) < STAGNATION_LIMIT:
+        return False
+    recent = action_history[-STAGNATION_LIMIT:]
+    # 检查最近 3 次是否都在做一模一样的事
+    return len(set((a['tool'], str(a['args'])) for a in recent)) == 1
+
+# 在主循环中检测
+if detect_loop(action_history):
+    messages.append({"role": "system", "content": "你陷入了循环。直接输出 Final Answer，说明无法完成的原因。"})
+```
+
+### 8.2 成本失控——Agent 偷偷帮你花钱
+
+```
+电商客服 Agent，日均 200 次对话
+每次对话：3250 Token
+月消耗：2000 万 Token
+
+Claude Opus:  $300/月
+Claude Sonnet: $60/月
+DeepSeek V3:  ¥20/月
+```
+
+> **经验**：Agent 开发阶段用便宜模型。上线后对任务分级——简单意图识别用 DeepSeek，复杂推理才切 Claude。定时拉 API 账单，发现异常立即排查。
+
+### 8.3 Human-in-the-Loop：不该让 Agent 自己做决定的事
+
+```python
+DANGEROUS_ACTIONS = ["delete_file", "drop_table", "send_email_to_all", "publish_article"]
+
+def requires_approval(action: dict) -> bool:
+    if action["tool"] in DANGEROUS_ACTIONS:
+        return True
+    if estimate_cost(action) > 0.5:  # 预估成本 > $0.5
+        return True
+    return False
+```
+
+> 一个真实事件：Agent 在测试环境自动 DROP 了一张表，因为 LLM 把「清理测试数据」理解成了 DROP TABLE。从那以后所有 DROP/TRUNCATE 操作都加了人工确认。
+
+### 8.4 Agent 输出质量的评估
+
+Agent 不像传统代码那么容易测：
+
+| 评估维度 | 问题 | 怎么测 |
+|---------|------|------|
+| 任务完成率 | 用户需求被满足了吗？ | 人工标注 100 个 case |
+| 工具选择 | 选的工具对吗？有没有多调/漏调？ | 对比最优调用路径 |
+| 效率 | 步骤数合理吗？有没有绕弯路？ | 统计平均步骤数 |
+| 安全 | 有没有危险操作？ | 敏感操作审计日志 |
+| 成本 | Token 消耗合理吗？ | 监控 API 账单 |
+
+---
+
 > 下一篇：**《LangGraph 入门：用状态图构建 Agent》**——告别手写循环，用声明式的方式定义 Agent 的行为逻辑。
 
 *系列文章：00-总纲 → ①-LLM 原理 → ②-Prompt 工程 → ③-Function Calling → ④-RAG → ⑤-Agent 模式 → ⑥-LangGraph → ⑦-MCP → ⑧-Multi-Agent*

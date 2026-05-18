@@ -305,6 +305,100 @@ except Exception as e:
 
 ---
 
+## 六、生产实战：这些坑你迟早会踩
+
+### 6.1 工具调用失败后的重试策略
+
+Agent 最怕的不是工具失败，是工具失败了 LLM 以为成功了。
+
+```python
+# 三种重试策略
+async def execute_tool_with_retry(func_name: str, args: dict, max_retries: int = 2):
+    """工具调用 + 智能重试"""
+    last_error = None
+    
+    for attempt in range(max_retries + 1):
+        try:
+            result = await available_functions[func_name](**args)
+            return {"success": True, "result": result}
+        except TimeoutError:
+            last_error = f"超时（第 {attempt+1} 次尝试）"
+            await asyncio.sleep(2 ** attempt)  # 指数退避
+        except ValueError as e:
+            # 参数错误 → 不用重试，让 LLM 修正参数
+            return {"success": False, "error": f"参数错误：{e}", "retry_with_fix": True}
+        except Exception as e:
+            last_error = str(e)
+    
+    return {"success": False, "error": last_error}
+```
+
+### 6.2 并行调用的陷阱
+
+```python
+# ❌ 错误：串行调天气
+for city in ["北京", "上海", "深圳", "广州"]:
+    weather = await get_weather(city)
+
+# ✅ 正确：并行调天气
+results = await asyncio.gather(
+    get_weather("北京"),
+    get_weather("上海"),
+    get_weather("深圳"),
+    get_weather("广州"),
+    return_exceptions=True  # 一个失败不影响其他的
+)
+```
+
+> 生产环境经验：10 个城市并行查天气，串行要 2 秒（每个 200ms），并行只要 200ms。但要注意 API rate limit——并行太多可能被限流。
+
+### 6.3 工具 Schema 写得不好 = LLM 选错工具
+
+```python
+# ❌ 两个工具描述太像，LLM 不知道该用哪个
+{"name": "search_docs", "description": "搜索文档"}
+{"name": "search_code", "description": "搜索代码"}
+
+# ✅ 差异化描述
+{
+    "name": "search_harmonyos_docs",
+    "description": "搜索华为官方 HarmonyOS 开发文档，返回 API 说明和代码示例。适用场景：用户问 API 用法、组件属性等。"
+}
+{
+    "name": "search_csdn_articles",
+    "description": "搜索 CSDN 博客的技术文章，返回实战经验和踩坑记录。适用场景：用户问怎么做、有什么坑等。"
+}
+```
+
+> **经验法则**：如果你在描述里加一个「不适用场景」，LLM 选错的概率降 30%。
+
+### 6.4 流式输出 + 工具调用
+
+Agent 对话中用户期待实时反馈，但工具调用是阻塞的：
+
+```python
+async def agent_loop_streaming(user_input: str):
+    """流式 Agent，工具调用时发送状态更新"""
+    
+    yield {"type": "status", "text": "正在分析你的问题..."}
+    
+    # ... LLM 决定调用工具 ...
+    
+    yield {"type": "status", "text": f"正在调用 {tool_name}..."}
+    
+    result = await execute_tool(tool_name, tool_args)
+    
+    yield {"type": "tool_result", "text": f"{tool_name} 返回：{result[:100]}..."}
+    
+    # ... LLM 生成最终回答 ...
+    async for chunk in llm.chat_stream(messages):
+        yield {"type": "chunk", "text": chunk}
+```
+
+> 用户盯着空白界面等 3 秒会觉得卡。每步发一个状态更新，体验完全不同。
+
+---
+
 ## 六、总结
 
 1. **Function Calling 是 Agent 的核心**——没有它，LLM 只是个聊天机器人

@@ -232,6 +232,102 @@ RAG 不是 Agent 的全部，但它是 Agent 的「知识层」。一个没有 R
 
 ---
 
+## 八、生产实战：RAG 系统上线前的检查清单
+
+### 8.1 混合检索 + 重排序（完整代码）
+
+纯向量检索准确率 70-75%。加上 BM25 关键词检索可到 85%+，再加 Cross-Encoder Reranker 可到 90%+：
+
+```python
+from rank_bm25 import BM25Okapi
+from sentence_transformers import CrossEncoder
+import jieba
+
+def hybrid_search_with_rerank(query: str, all_docs: list[str], top_k: int = 5):
+    # 1. 向量检索
+    vec_results = collection.query(query_texts=[query], n_results=20)
+    
+    # 2. BM25 关键词检索
+    tokenized_corpus = [list(jieba.cut(doc)) for doc in all_docs]
+    bm25 = BM25Okapi(tokenized_corpus)
+    bm25_scores = bm25.get_scores(list(jieba.cut(query)))
+    bm25_top = sorted(range(len(bm25_scores)), 
+                      key=lambda i: bm25_scores[i], reverse=True)[:20]
+    
+    # 3. RRF 融合 (k=60)
+    rrf = {}
+    for rank, doc in enumerate(vec_results['documents'][0]):
+        rrf[doc] = rrf.get(doc, 0) + 1/(61 + rank)
+    for rank, idx in enumerate(bm25_top):
+        doc = all_docs[idx]
+        rrf[doc] = rrf.get(doc, 0) + 1/(61 + rank)
+    
+    candidates = sorted(rrf.items(), key=lambda x: x[1], reverse=True)[:10]
+    
+    # 4. Cross-Encoder 重排序
+    reranker = CrossEncoder('BAAI/bge-reranker-large')
+    pairs = [[query, doc] for doc, _ in candidates]
+    scores = reranker.predict(pairs)
+    ranked = sorted(zip([d for d,_ in candidates], scores), 
+                    key=lambda x: x[1], reverse=True)
+    return [doc for doc, _ in ranked[:top_k]]
+```
+
+### 8.2 RAG 评估指标
+
+做 RAG 最怕「感觉变好了」——必须有量化指标：
+
+| 指标 | 含义 | 合格线 |
+|------|------|:--:|
+| Hit Rate@10 | Top-10 包含正确答案的比例 | > 85% |
+| MRR | 第一个正确答案的平均排名倒数 | > 0.6 |
+| NDCG@10 | 考虑排序位置的精度 | > 0.7 |
+
+```python
+def evaluate_rag(test_queries: list[dict]):
+    """test_queries = [{"query": "...", "expected_doc_id": "doc_3"}]"""
+    hits, rr = 0, []
+    for t in test_queries:
+        results = collection.query(query_texts=[t["query"]], n_results=10)
+        if t["expected_doc_id"] in results["ids"][0]:
+            hits += 1
+            rank = results["ids"][0].index(t["expected_doc_id"]) + 1
+            rr.append(1/rank)
+        else:
+            rr.append(0)
+    print(f"Hit Rate@10: {hits/len(test_queries):.1%}  MRR: {sum(rr)/len(rr):.4f}")
+```
+
+### 8.3 Query 改写：模糊问题搜不到的原因
+
+用户问「上次那个方法怎么用」——直接向量化什么都搜不到。必须先用 LLM 改写：
+
+```python
+REWRITE_PROMPT = "将模糊问题改写为适合检索的查询。补充指代，拆解复合问题。输出 {\"queries\": [\"查询1\"]}"
+
+async def rewrite_query(user_input: str, history: list) -> list[str]:
+    response = await llm.chat([
+        {"role": "system", "content": REWRITE_PROMPT},
+        {"role": "user", "content": f"历史：{history}\n问题：{user_input}"}
+    ])
+    return json.loads(response)["queries"]
+```
+
+### 8.4 RAG vs 长 Context：什么时候不需要 RAG
+
+Claude 200K Context Window 能装下一整本书。那还要 RAG 吗？
+
+| 场景 | 方案 | 理由 |
+|------|------|------|
+| 固定文档（如产品手册） | RAG | 只需检索相关部分 |
+| 一次性长文档分析 | 直接塞 Context | RAG 检索有损耗 |
+| 多轮对话引用文档 | RAG | 不可能每轮都塞全文 |
+| 文档频繁更新 | RAG | 只需更新向量库 |
+
+> **经验**：大多数场景下 RAG 更优。长 Context 是备选方案——Token 成本高且推理速度随 Context 增长线性下降
+
+---
+
 > 下一篇：**《Agent 设计模式：ReAct 与 Plan-Execute》**——两种最经典的 Agent 模式，让你的 Agent 学会「思考」。
 
 *系列文章：00-总纲 → ①-LLM 原理 → ②-Prompt 工程 → ③-Function Calling → ④-RAG → ⑤-Agent 模式 → ⑥-LangGraph → ⑦-MCP → ⑧-Multi-Agent*

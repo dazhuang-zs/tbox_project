@@ -205,19 +205,141 @@ LLM 会「失忆」——最前面的对话被丢弃。这解释了为什么和 
 
 ---
 
-## 八、关键面试题
+## 八、生产实战：你没在文档里见过的坑
+
+### 8.1 Token 成本快速算
+
+假设你每天让 Agent 处理 50 个用户请求，每个请求平均 3 轮对话：
+
+```
+单次请求 Token 消耗：
+  System Prompt:  500 Token
+  用户问题:        200 Token
+  RAG 检索结果:    3000 Token
+  LLM 回答:        800 Token
+  ─────────────────────────
+  单次:           4500 Token
+
+日消耗：50 × 3 × 4500 = 675,000 Token
+月消耗：675,000 × 30 ≈ 2000 万 Token
+
+费用对比（2026 年 5 月）：
+  DeepSeek V3:  2000万 × ¥0.001/千 = ¥20/月   ← 便宜
+  Claude Sonnet: 2000万 × $3/百万 = $60/月     ← 中等
+  GPT-4o:       2000万 × $5/百万 = $100/月     ← 贵
+```
+
+> **实战经验**：Agent 开发初期用 DeepSeek 跑通流程，上线后根据任务复杂度选择——简单任务 DeepSeek，复杂推理切 Claude。混合模型策略能省 60-70% 成本。
+
+### 8.2 Context Window 满了会发生什么——真实事故
+
+一个 Agent 跑了 30 轮对话后开始「精神分裂」：忘记自己的 System Prompt、重复执行已完成的任务、甚至输出和当前话题完全无关的内容。
+
+根因：对话历史 + RAG 文档 + 工具返回 > Context Window，LLM 自动截断了最前面的 System Prompt 和早期对话。
+
+```python
+# 生产环境的上下文管理策略
+def manage_context(messages: list, max_tokens: int = 100000) -> list:
+    """防止上下文溢出"""
+    total = estimate_tokens(messages)
+    
+    if total <= max_tokens:
+        return messages
+    
+    # 策略 1：保留 System Prompt（最重要的）
+    system_msgs = [m for m in messages if m["role"] == "system"]
+    
+    # 策略 2：对早中期对话做摘要
+    early_msgs = messages[len(system_msgs):len(messages)//2]
+    summary = summarize_conversation(early_msgs)
+    
+    # 策略 3：保留最近的对话（最相关）
+    recent_msgs = messages[len(messages)//2:]
+    
+    return system_msgs + [{"role": "system", "content": f"对话摘要：{summary}"}] + recent_msgs
+```
+
+> 我在生产环境的经验是：**设一个 Token 预算告警阈值（比如 80% Context Window），触发时自动压缩早期对话。** 等到满了再处理就晚了。
+
+### 8.3 为什么同一个 Prompt，有时好有时坏
+
+LLM 本质上是概率模型。Temperature=0 也不能保证 100% 可复现。两个原因：
+
+1. **GPU 浮点运算的非确定性**：同一计算在不同 GPU 上可能产生微小差异，累积后影响 Token 选择
+2. **Provider 端可能修改了推理参数**：API 背后可能有负载均衡、模型热更新
+
+```python
+# 生产环境做稳定性测试
+import statistics
+
+def test_prompt_stability(prompt: str, n: int = 5) -> dict:
+    """同一个 Prompt 跑 n 次，看输出稳定性"""
+    outputs = []
+    for _ in range(n):
+        response = llm.chat([{"role": "user", "content": prompt}])
+        outputs.append(response)
+    
+    # 检查输出长度方差
+    lengths = [len(o) for o in outputs]
+    
+    # 如果输出长度标准差 > 均值的 20%，说明不够稳定
+    if statistics.stdev(lengths) > statistics.mean(lengths) * 0.2:
+        print("⚠️ Prompt 输出不够稳定，建议加更多约束")
+    
+    return {"outputs": outputs, "length_std": statistics.stdev(lengths)}
+```
+
+### 8.4 模型选型：不是越贵越好
+
+| 任务类型 | 推荐模型 | 理由 |
+|---------|---------|------|
+| 代码生成 | Claude Sonnet / DeepSeek V3 | 代码能力强，性价比高 |
+| 代码审查 / 复杂重构 | Claude Opus | 推理深度够 |
+| 中文问答 / 摘要 | DeepSeek V3 / Qwen3-Max | 中文理解好 |
+| JSON 结构化输出 | GPT-4o / DeepSeek V3 | JSON mode 稳定 |
+| 超长文档分析 | Gemini 2.5 Pro (1M context) | Context Window 最大 |
+| 成本敏感场景 | DeepSeek V3 | 白菜价 |
+
+> 一个真实案例：代码审查 Agent 用 Claude Opus 每月烧 $200，换成「Sonnet 审查 + Opus 复核关键文件」后降到 $60，审查质量基本一致。
+
+### 8.5 调试 Token 级别的问题
+
+```python
+# 用 logprobs 看 LLM 为什么不按你想要的输出
+response = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[...],
+    logprobs=True,       # 返回每个 Token 的概率
+    top_logprobs=3       # 返回 Top-3 候选 Token 及其概率
+)
+
+# 如果某个 Token 的概率最高但也不到 30%，说明 LLM 很犹豫
+# → 你的 Prompt 不够明确，需要加约束
+for token_info in response.choices[0].logprobs.content:
+    print(f"Token: {token_info.token}")
+    for alt in token_info.top_logprobs:
+        print(f"  候选: {alt.token} ({alt.logprob:.2%})")
+```
+
+---
+
+## 九、关键面试题
 
 **Q1：Token 和字有什么区别？**
 
 Token 是 LLM 处理的最小单位。中文 1 个字可能占 1-2 Token，英文 1 个单词通常 1 Token。API 按 Token 计费。
 
-**Q2：为什么 Context Window 越大越好？**
+**Q2：生产环境怎么管理 Context Window？**
 
-越大能处理的信息越多。但上下文管理同样重要——多轮对话、RAG 检索、工具返回都在消耗 Token。
+三个策略：① System Prompt 永远不截断；② 早期对话自动摘要压缩；③ 设 Token 预算告警（80% 触发）。不能等满了再处理。
 
-**Q3：Temperature=0 和 Temperature=1 的区别？**
+**Q3：如何降低 Token 成本？**
 
-T=0 确定性强，每次输出一样，适合代码；T=1 有创造力，适合写作。本质是控制 Token 概率分布的平滑度。
+混合模型策略——简单任务用便宜模型（DeepSeek），复杂推理用强模型（Claude）。50% 的 Agent 请求其实不需要最强模型。
+
+**Q4：Temperature=0 能保证输出一致吗？**
+
+不能。GPU 浮点非确定性 + Provider 端可能的模型更新会导致差异。生产环境需要监控输出稳定性。
 
 ---
 

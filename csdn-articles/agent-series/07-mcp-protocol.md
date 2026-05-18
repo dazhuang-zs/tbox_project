@@ -248,6 +248,101 @@ def read_file_safe(path: str) -> str:
 
 ---
 
+## 九、生产实战：MCP Server 上线的检查清单
+
+### 9.1 权限隔离——MCP Server 的安全底线
+
+MCP Server 在本地运行时，默认拥有当前用户的全部文件权限。一个 LLM 调了你的 MCP Server，等于有了你的系统权限：
+
+```bash
+# 最安全的方式：Docker 隔离运行
+# Dockerfile.mcp
+FROM python:3.12-slim
+RUN pip install mcp
+COPY my_server.py /app/
+WORKDIR /app
+CMD ["python", "my_server.py"]
+
+# 启动时限制文件系统访问
+# 只允许读写 /safe_data 目录
+docker run --rm \
+  -v /safe_data:/safe_data:rw \
+  --read-only \
+  --network none \
+  my-mcp-server
+```
+
+> **经验**：不要在生产环境用 `python my_server.py` 直接跑。MCP Server 跑在 Docker 里，限制文件系统和网络访问，就算 LLM 发疯也炸不了宿主机。
+
+### 9.2 高频调用的性能陷阱
+
+一个 Agent 可能在一轮对话中连续调用 10+ 次 MCP 工具。如果 MCP Server 每次都要冷启动，延迟不可接受：
+
+```python
+# ❌ 每个请求重连数据库
+def get_user(id: str) -> str:
+    db = connect_to_db()  # 慢
+    result = db.query(id)
+    db.close()
+    return result
+
+# ✅ 启动时建立连接池，复用
+class DatabasePool:
+    def __init__(self):
+        self.pool = create_connection_pool(min_size=2, max_size=10)
+    
+    def get_user(self, id: str) -> str:
+        with self.pool.get_connection() as conn:
+            return conn.query(id)
+
+db_pool = DatabasePool()  # 全局单例
+
+@mcp.tool()
+def get_user(id: str) -> str:
+    return db_pool.get_user(id)
+```
+
+### 9.3 MCP Server 的版本兼容
+
+MCP 协议还在快速演进。2025 年 3 月从 HTTP+SSE 升级到 Streamable HTTP。你的 Server 可能突然不兼容新版 Claude Desktop：
+
+```python
+# 用 __version__ 标记协议版本，方便排查
+# 如果 Claude Desktop 更新后连不上，先检查协议版本
+mcp = FastMCP("my-server", version="1.0.0")
+
+# 锁定 mcp 依赖版本，避免自动升级踩坑
+# requirements.txt
+mcp==1.8.0
+```
+
+### 9.4 调试：看不到 MCP Server 的报错
+
+MCP stdio 模式的报错不会出现在终端里——它藏在日志文件中：
+
+```bash
+# Claude Desktop 的 MCP 日志
+tail -f ~/Library/Logs/Claude/mcp*.log
+
+# 或者用 MCP Inspector 调试
+npx @modelcontextprotocol/inspector python my_server.py
+```
+
+### 9.5 测试 MCP Server
+
+```python
+import pytest
+from mcp import Client
+
+@pytest.mark.asyncio
+async def test_get_weather():
+    async with Client("python my_server.py") as client:
+        result = await client.call_tool("get_weather", {"city": "北京"})
+        assert "晴" in result or "雨" in result or "多云" in result
+```
+
+---
+
 > 下一篇：**《Multi-Agent 协作：CrewAI 实战》**——让 PM Agent、开发 Agent、测试 Agent 一起干活。
 
 *系列文章：00-总纲 → ①-LLM 原理 → ②-Prompt 工程 → ③-Function Calling → ④-RAG → ⑤-Agent 模式 → ⑥-LangGraph → ⑦-MCP → ⑧-Multi-Agent*

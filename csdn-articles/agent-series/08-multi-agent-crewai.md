@@ -320,6 +320,75 @@ Task(
 
 ---
 
-> 🎉 系列完结。从 LLM 原理到 Multi-Agent 协作，8 篇文章覆盖 Agent 开发全路径。接下来就是动手做项目——把学到的每一块拼成你自己的 Agent 产品。
+## 十、生产实战：Multi-Agent 的隐藏成本
 
-*系列文章：00-总纲 → ①-LLM 原理 → ②-Prompt 工程 → ③-Function Calling → ④-RAG → ⑤-Agent 模式 → ⑥-LangGraph → ⑦-MCP → ⑧-Multi-Agent*
+### 10.1 成本：Agent 越多不等于越好
+
+```
+单 Agent 完成任务：
+  1 个 LLM 调用 → 5000 Token → 完成
+
+CrewAI 4 个 Agent 完成同一个任务：
+  PM Agent:     2000 Token
+  后端 Agent:   3000 Token
+  前端 Agent:   3000 Token
+  测试 Agent:   2000 Token
+  ───────────────────────
+  总计:        10000 Token  (2×)
+  时间:       4×（串行模式下）
+```
+
+> **经验**：评估一个任务是否真的需要 Multi-Agent。如果任务能在一个 Agent 的 Context Window 内完成，单 Agent 更便宜更快。Multi-Agent 用于「单 Agent 真的搞不定」的场景。
+
+### 10.2 Agent 间的沟通成本
+
+Agent 的输出给下一个 Agent ——如果格式不一致，后面全乱：
+
+```python
+# PM Agent 输出的数据模型 → 前后端 Agent 必须严格一致
+{
+  "api": {
+    "GET /transactions": {
+      "params": {"month": "string"},
+      "response": {"transactions": "array", "total": "number"}
+    }
+  }
+}
+
+# 如果 PM 输出 {"total": "int"} 但后端写成 {"total": "float"}
+# 前端解析会炸 → 而 Agent 不会主动告诉你
+```
+
+> **经验**：Multi-Agent 项目中，PM Agent 的输出用严格的 JSON Schema 约束。后续 Agent 在开始干活前，先验证上游输入是否合法。
+
+### 10.3 错误级联：一个小错放大 4 倍
+
+PM Agent 理解错了一个需求 → 后端按错的写 → 前端按错的对接 → 测试按错的验证 → 4 个 Agent 都在做无用功。
+
+```python
+# 每步执行后做验证
+class ValidatedTask(Task):
+    def execute(self, context):
+        result = super().execute(context)
+        # 如果是 PM 的输出，先给用户看一眼
+        if self.agent.role == "产品经理":
+            if not confirm_with_human(result):
+                return {"error": "用户撤销了 PRD"}
+        return result
+```
+
+> **经验**：在 PM Agent 之后加一个「人类确认」环节，收益远大于成本。PM 错 = 全线错。
+
+### 10.4 什么时候不该用 Multi-Agent
+
+| 场景 | 建议 | 理由 |
+|------|------|------|
+| 单步骤简单任务 | 单 Agent | Multi-Agent 纯属浪费 |
+| 任务可在一个 Context Window 完成 | 单 Agent | 串行 Multi-Agent 更慢更贵 |
+| Agent 角色高度重叠 | 单 Agent | 两个 Agent 干同样的事 = 内耗 |
+| 需要极致低延迟（< 1s） | 单 Agent | Multi-Agent 串行延迟叠加 |
+| 复杂多领域任务 | Multi-Agent | 单 Agent Context 不够用 |
+
+---
+
+> 🎉 系列完结。8 篇文章从 Token 原理写到 Multi-Agent 协作，每篇都带了生产环境的真实经验和坑。接下来的关键是把这些串起来做一个你自己的 Agent 产品——代码是学出来的，经验是踩坑踩出来的。

@@ -257,6 +257,87 @@ print(f"修复代码：\n{result['fixed_code']}")
 
 ---
 
+## 七、生产实战：LangGraph 跑到生产才知道的事
+
+### 7.1 持久化和断点续跑
+
+Agent 跑了 10 步后崩溃了，从头再跑一遍？生产环境不允许：
+
+```python
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.sqlite import SqliteSaver
+
+# 开发环境：内存存储
+memory = MemorySaver()
+
+# 生产环境：SQLite 持久化（重启不丢）
+checkpointer = SqliteSaver.from_conn_string("checkpoints.db")
+
+graph = graph.compile(checkpointer=checkpointer)
+
+# 运行时可指定 thread_id 来区分会话
+config = {"configurable": {"thread_id": "user-session-123"}}
+result = graph.invoke(initial_state, config)
+
+# 如果崩溃了，同一个 thread_id 可以从上次的 checkpoint 继续
+result = graph.invoke(None, config)  # None = 从上次 checkpoint 恢复
+```
+
+### 7.2 流式输出：用户不想等
+
+Agent 执行期间用户盯着空白界面，体验很差：
+
+```python
+# 每个节点完成后推送状态更新
+async for event in graph.astream(initial_state):
+    node_name = list(event.keys())[0]
+    yield {"type": "node_update", "node": node_name, "status": "completed"}
+    
+    # 如果是 chatbot 节点，流式输出 Token
+    if node_name == "chatbot":
+        for chunk in event[node_name]["messages"][-1].content:
+            yield {"type": "chunk", "text": chunk}
+```
+
+### 7.3 节点级错误处理
+
+```python
+from langgraph.graph import StateGraph
+
+def safe_review(state: State) -> State:
+    try:
+        return review_code(state)
+    except Exception as e:
+        state["error"] = str(e)
+        state["step"] = "error_handler"
+        return state
+
+# 注册错误处理节点
+graph.add_node("review", safe_review)
+graph.add_node("error_handler", handle_error)
+graph.add_conditional_edges("review", lambda s: s["step"], {
+    "fix": "fix",
+    "pass": END,
+    "error_handler": "error_handler"
+})
+```
+
+### 7.4 并行节点：速度翻倍
+
+LangGraph 的 Send API 支持并行：
+
+```python
+from langgraph.types import Send
+
+# 继续条件：为每个 sub-task 创建并行执行
+async def continue_to_workers(state):
+    return [Send("worker", {"task": t}) for t in state["tasks"]]
+
+# 3 个 worker 同时执行，总时间 = 最慢的那个
+```
+
+---
+
 > 下一篇：**《MCP 协议实战：给 AI 接上外部世界》**——写一个 MCP Server，让 Claude Desktop、Cursor 都能调用你的工具。
 
 *系列文章：00-总纲 → ①-LLM 原理 → ②-Prompt 工程 → ③-Function Calling → ④-RAG → ⑤-Agent 模式 → ⑥-LangGraph → ⑦-MCP → ⑧-Multi-Agent*
