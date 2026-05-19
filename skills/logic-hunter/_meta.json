@@ -1,0 +1,17 @@
+{
+  "owner": "ken0122",
+  "slug": "logic-hunter",
+  "displayName": "Logic Hunter",
+  "latest": {
+    "version": "1.0.0",
+    "publishedAt": 1772535636278,
+    "commit": "https://github.com/openclaw/skills/commit/5b4813c85dac480e06a5c931ab3724508891be2c"
+  },
+  "history": [
+    {
+      "version": "0.1.0",
+      "publishedAt": 1772502623050,
+      "commit": "https://github.com/openclaw/skills/commit/4cae48cb774bb0c7179216469e4b2c15094b739f"
+    }
+  ]
+}

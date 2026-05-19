@@ -1,0 +1,22 @@
+{
+  "owner": "krishna-505",
+  "slug": "skill-compass",
+  "displayName": "SkillCompass — Skill Evolution Engine",
+  "latest": {
+    "version": "1.0.5",
+    "publishedAt": 1775032723894,
+    "commit": "https://github.com/openclaw/skills/commit/a4fad09ed278a442ec84aa9717a05e6ad370d200"
+  },
+  "history": [
+    {
+      "version": "1.0.4",
+      "publishedAt": 1774711895277,
+      "commit": "https://github.com/openclaw/skills/commit/d49de3323d212228552fc84167c64e2134c0326e"
+    },
+    {
+      "version": "1.0.3",
+      "publishedAt": 1774582640790,
+      "commit": "https://github.com/openclaw/skills/commit/dd866c1ff88b8dd7270b602661e3992210599a55"
+    }
+  ]
+}
