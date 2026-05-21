@@ -32,9 +32,9 @@
 
 这说明退化问题的根因不只是梯度消失。
 
-### 退化问题的真正根因：非线性表达能力饱和
+### 退化问题的真正根因：优化难度
 
-更精确的解释是这样的：
+更准确的说法是：深层网络的**优化难度**远高于浅层网络。即使更深的网络理论上拥有更强的表达能力，标准的随机梯度下降却很难找到一个好的解。
 
 假设我们要学习一个恒等映射 H(x) = x（输入等于输出）。
 
@@ -142,28 +142,29 @@ ResNet 不是一个网络，而是一族网络。常见的有 ResNet-18/34/50/10
 
 ```python
 class BottleneckBlock(nn.Module):
-    """ResNet-50+ 使用的瓶颈残差块"""
+    """ResNet-50+ 使用的瓶颈残差块
+    out_channels 指中间层通道数，实际输出通道 = out_channels * expansion
+    """
     expansion = 4  # 输出通道数是中间层的 4 倍
 
     def __init__(self, in_channels, out_channels, stride=1):
         super().__init__()
-        mid_channels = out_channels  # 中间层通道数
-
-        self.conv1 = nn.Conv2d(in_channels, mid_channels, 1)   # 降维
-        self.bn1 = nn.BatchNorm2d(mid_channels)
-        self.conv2 = nn.Conv2d(mid_channels, mid_channels,
+        # out_channels 是中间层通道数，输出为 out_channels * 4
+        self.conv1 = nn.Conv2d(in_channels, out_channels, 1)   # 降维
+        self.bn1 = nn.BatchNorm2d(out_channels)
+        self.conv2 = nn.Conv2d(out_channels, out_channels,
                                 3, stride=stride, padding=1)    # 空间卷积
-        self.bn2 = nn.BatchNorm2d(mid_channels)
-        self.conv3 = nn.Conv2d(mid_channels, out_channels * 4, 1)  # 升维
-        self.bn3 = nn.BatchNorm2d(out_channels * 4)
+        self.bn2 = nn.BatchNorm2d(out_channels)
+        self.conv3 = nn.Conv2d(out_channels, out_channels * self.expansion, 1)  # 升维
+        self.bn3 = nn.BatchNorm2d(out_channels * self.expansion)
         self.relu = nn.ReLU(inplace=True)
 
         self.shortcut = nn.Sequential()
-        if stride != 1 or in_channels != out_channels * 4:
+        if stride != 1 or in_channels != out_channels * self.expansion:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(in_channels, out_channels * 4,
+                nn.Conv2d(in_channels, out_channels * self.expansion,
                           1, stride=stride),
-                nn.BatchNorm2d(out_channels * 4)
+                nn.BatchNorm2d(out_channels * self.expansion)
             )
 
     def forward(self, x):
@@ -196,7 +197,7 @@ class BottleneckBlock(nn.Module):
 
 这是最关键的问题。数学上可以严格解释：
 
-设残差块输入为 x，输出为 H(x) = F(x) + x。
+设**单个残差块**的输入为 x，输出为 H(x) = F(x) + x。
 
 反向传播时，梯度流向两条路径：
 
@@ -218,6 +219,8 @@ class BottleneckBlock(nn.Module):
 
 这从根本上解决了深层网络的梯度传播问题，使得训练 100+ 层的网络成为可能。
 
+原论文的消融实验直接验证了这一点：plain-34 在 ImageNet 上的 top-1 error 为 25.02%，而 ResNet-34 降到了 21.53%——残差连接带来了 3.5 个百分点的提升。
+
 ---
 
 ## 五、踩坑实录：ResNet 训练常见问题
@@ -226,7 +229,7 @@ class BottleneckBlock(nn.Module):
 
 残差块里顺序是 `Conv → BN → ReLU`，不是 `Conv → ReLU → BN`。
 
-BatchNorm 放在 ReLU 前面，能让 ReLU 的非线性发生在归一化之后，减少信息损失。很多开源实现写反了，训练结果会有细微差距。
+BatchNorm 放在 ReLU 前面，能对未激活的特征做归一化，保持梯度流更稳定。如果 BN 放在 ReLU 后面，ReLU 的零值输出会被 BN 归一化为非零，破坏了稀疏性。很多开源实现写反了，训练结果会有细微差距。
 
 ```python
 # ✅ 正确顺序
